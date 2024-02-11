@@ -1,5 +1,6 @@
 """Perform an experiment to study efficiency of containment checking for collections."""
 
+from multiprocessing.reduction import duplicate
 import timeit
 
 import typer
@@ -58,6 +59,7 @@ def containmentcheck(
     size: int = typer.Option(5),
     maximum: int = typer.Option(25),
     exceed: bool = typer.Option(False),
+    duplicates: int = typer.Option(0),
     approach: ContainmentCheckApproach = ContainmentCheckApproach.list,
 ) -> None:
     """Conduct an experiment to measure the performance of containment checking."""
@@ -66,6 +68,9 @@ def containmentcheck(
     # generate a random value that goes up to the maximum value;
     # if the value of exceed is True then generate a number beyond the maximum
     random_number = generate_random_number(maximum, exceed)
+    # if the number of duplicates is greater than the size of the container,
+    # set duplicates to the size of the container
+    if duplicates > size: duplicates = size
     # display diagnostic details about the configuration of the experiment
     console.print(
         ":sparkles: Conducting an experiment to measure the performance of containment checking!"
@@ -76,6 +81,9 @@ def containmentcheck(
         f"\tMaximum value for a number in the data container: {maximum}"
     )
     console.print(
+        f"\tNumber of duplicates generated in the data container: {duplicates}"
+    )
+    console.print(
         f"\tShould the value to search for exceed the maximum number? {human_readable_boolean(exceed)}"
     )
     console.print()
@@ -83,7 +91,7 @@ def containmentcheck(
     if approach.value == ContainmentCheckApproach.list:
         # generate the container of inputs consisting of random integer values
         random_container = generate_random_container(
-            size, maximum, make_tuple=False
+            size, maximum, False, duplicates
         )
         # create the containment check lambda function
         containment_check_lambda = lambda: containment_check_list(
@@ -95,7 +103,7 @@ def containmentcheck(
     elif approach.value == ContainmentCheckApproach.tuple:
         # generate the container of inputs consisting of random integer values
         random_container = generate_random_container(
-            size, maximum, make_tuple=True
+            size, maximum, True, duplicates
         )
         # create the containment check lambda function
         containment_check_lambda = lambda: containment_check_tuple(
@@ -107,11 +115,13 @@ def containmentcheck(
     elif approach.value == ContainmentCheckApproach.set:
         # generate the container of inputs consisting of random integer values
         random_container = generate_random_container(
-            size, maximum, make_tuple=False
+            size, maximum, False, duplicates
         )
+        # convert random number container from list to set before timing check
+        random_container_set = set(random_container)
         # generate a random value that goes up to the maximum value;
         containment_check_lambda = lambda: containment_check_set(
-            random_container,  # type: ignore
+            random_container_set,  # type: ignore
             random_number,
         )
         perform_containment_check_benchmark(containment_check_lambda)
