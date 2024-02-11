@@ -1,6 +1,5 @@
 """Perform an experiment to study efficiency of containment checking for collections."""
 
-from multiprocessing.reduction import duplicate
 import timeit
 
 import typer
