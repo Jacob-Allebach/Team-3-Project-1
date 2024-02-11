@@ -1,6 +1,6 @@
 """Perform containment checks on data values in a collection."""
 
-from typing import List, Tuple
+from typing import List, Tuple, Set
 
 # Make sure that you understand how each of these functions work
 
@@ -30,7 +30,7 @@ def containment_check_tuple(thetuple: Tuple[int], number: int) -> bool:
     return found
 
 
-def containment_check_set(thelist: List[int], number: int) -> bool:
+def containment_check_set(theset: Set[int], number: int) -> bool:
     """Determine if a value is contained in the set."""
     # Conventional wisdom often suggests it is faster to:
     # - Convert a list to a set
@@ -39,7 +39,6 @@ def containment_check_set(thelist: List[int], number: int) -> bool:
     # Reference to support this assertion:
     # https://docs.quantifiedcode.com/python-anti-patterns/performance/using_key_in_list_to_check_if_key_is_contained_in_a_list.html
     found = False
-    theset = set(thelist)
     if number in theset:
         found = True
     return found
